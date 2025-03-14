@@ -1,0 +1,22 @@
+# Compiled output
+dist/
+build/
+*.js
+*.js.map
+
+# Dependencies
+node_modules/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Testing
+coverage/
+
+# System files
+.DS_Store
