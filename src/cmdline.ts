@@ -22,7 +22,7 @@ export async function getInput(prompt?: string): Promise<string> {
 
 export async function callMyFunc() {
 
-    let answer = await getInput()
+    let answer = await getInput("CALL MY FUNC: ")
     console.log(answer)
 
 }
