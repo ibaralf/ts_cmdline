@@ -1,6 +1,9 @@
 import * as readline from 'readline';
 import * as fs from 'fs';
+import readConfigFile from './config_lib';
+import {Config} from './config_lib';
 
+let cfg = <Config>{};
 
 async function getUserInput(query: string): Promise<string> {
     const rl = readline.createInterface({
@@ -16,6 +19,7 @@ async function getUserInput(query: string): Promise<string> {
     });
 }
 
+// TODO: add range options
 async function getInteger(userPrompt? :string): Promise<number> {
     const intPattern: RegExp = /^[0-9]+$/i;
     var promptText = ""
@@ -68,18 +72,17 @@ async function promptYesNo(userPrompt? :string): Promise<string> {
     });
 }
 
-
-async function showLogo(filePath: string): Promise<void> {
-    const logoText = await fs.promises.readFile(filePath, 'utf8');
+async function showLogo(): Promise<void> {
+    let lpath = process.cwd() + "/" + cfg.logo_path;
+    const logoText = await fs.promises.readFile(lpath, 'utf8');
     console.log(logoText);
     return new Promise(resolve => resolve(null));
 }
 
-
 async function main() {
-    console.log("");
-    let cwd = process.cwd() + "/components/" + "logo.txt";
-    const nval = await Promise.all([showLogo(cwd)])
+    cfg = await readConfigFile()
+    
+    const nval = await Promise.all([showLogo()])
 
     //console.log('FIRST');
     const name = await getUserInput('Please enter your name: ');
@@ -94,30 +97,3 @@ async function main() {
 
 main();
 
-
-// async function promptForInteger(promptMessage: string): number {
-//     let userInput: string | null;
-//     let parsedNumber: number;
-
-//     while (true) {
-//         //userInput = prompt(promptMessage);
-//         userInput = await getUserInput('Enter a Number: ');
-        
-//         if (userInput === null) {
-//             console.log("Input canceled. Please enter a valid integer.");
-//             continue;
-//         }
-        
-//         parsedNumber = parseInt(userInput, 10);
-        
-//         if (!isNaN(parsedNumber) && Number.isInteger(parsedNumber)) {
-//             return parsedNumber;
-//         }
-        
-//         console.log("Invalid input. Please enter a valid integer.");
-//     }
-// }
-
-// // Example usage
-// const userInteger = promptForInteger("Please enter an integer:");
-// console.log("You entered:", userInteger);
