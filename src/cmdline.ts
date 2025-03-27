@@ -2,8 +2,11 @@ import * as readline from 'readline';
 import * as fs from 'fs';
 import readConfigFile from './config_lib';
 import {Config} from './config_lib';
+import {formPrompt} from "./utils/string_utils";
 
 // TODO:
+// * add tests under ./tests
+// * add default values
 // * add date entry
 // * add multiple choice
 // * add range options
@@ -25,10 +28,7 @@ async function getUserInput(query: string): Promise<string> {
 
 async function getInteger(userPrompt? :string): Promise<number> {
     const intPattern: RegExp = /^[0-9]+$/i;
-    var promptText = ""
-    if (userPrompt) {
-        promptText = userPrompt;
-    }
+    var promptText = formPrompt(userPrompt);
     var myVal: number = null;
     var notDone = true;
     while(notDone) {
@@ -48,10 +48,7 @@ async function getInteger(userPrompt? :string): Promise<number> {
 }
 
 async function promptYesNo(userPrompt? :string): Promise<string> {
-    let promptText = "(Y/N)? "
-    if (userPrompt) {
-        promptText = userPrompt + " " + promptText;
-    }
+    let promptText = formPrompt(userPrompt) + "(Y/N)? "
     var myVal: string = null;
     var notDone = true;
     while(notDone) {
@@ -78,6 +75,27 @@ function errorPromise(): Promise<string> {
     });
 }
 
+async function getDate(userPrompt?: string): Promise<string> {
+    const datePattern: RegExp = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/i;
+    var promptText = formPrompt(userPrompt);
+    var myVal: string = null;
+    var notDone = true;
+    while(notDone) {
+        let myDate: string = null;
+        const dateVal = await getUserInput(promptText);
+        if (datePattern.test(dateVal)) {
+            notDone = false;
+            myVal = dateVal;
+        } else {
+            console.log('ERROR: Please enter a valid date (MM/DD/YYYY).')
+        }
+    }
+
+    return new Promise((resolve) => {
+        resolve(myVal)
+    });
+}
+
 async function selectChoice(choices: string[], choiceOpt?: string[], userPrompt? :string): Promise<string> {
 
     var userChoices: string[] = [];
@@ -91,10 +109,7 @@ async function selectChoice(choices: string[], choiceOpt?: string[], userPrompt?
             userChoices.push(String(index + 1));
         });
     }
-    var promptText = ""
-    if (userPrompt) {
-        promptText = userPrompt + " ";
-    }
+    var promptText = formPrompt(userPrompt);
     choices.forEach((choice, index) => {
         console.log(userChoices[index] + ") " + choice);
     });
@@ -127,6 +142,9 @@ async function main() {
     cfg = await readConfigFile()
     
     const nval = await Promise.all([showLogo()])
+
+    const currdate = await getDate("What is the current date?");
+    console.log(`CURRDATE IS: ${currdate}`);
 
     const picks: string[] = ["Apple", "Banana", "Carrot", "All"];
     const pickOpt: string[] = ["a", "b", "c", "d"];
