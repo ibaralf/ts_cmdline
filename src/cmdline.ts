@@ -2,11 +2,10 @@ import * as readline from 'readline';
 import * as fs from 'fs';
 import readConfigFile from './config_lib';
 import {Config} from './config_lib';
-import {formPrompt} from "./utils/string_utils";
-import {getDate, getInteger, getUserInput, selectChoice, promptYesNo} from "./lib/prompt_lib";
+import {getUserInput} from "./utils/user_input_utils";
+import {getDate, getInteger, selectChoice, promptYesNo} from "./lib/prompt_lib";
 
 // TODO:
-// * add tests under ./tests
 // * add default values
 // * add date entry
 // * add multiple choice

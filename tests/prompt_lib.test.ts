@@ -1,7 +1,6 @@
-import { getUserInput, getInteger } from '../src/lib/prompt_lib'; // Replace './your-module' with the actual path
+import { getInteger, promptYesNo } from '../src/lib/prompt_lib'; // Replace './your-module' with the actual path
 import * as readline from 'readline';
 
-// Helper function to mock readline
 function mockReadline(answer: string) {
     const mockQuestion = jest.fn();
     const mockClose = jest.fn();
@@ -18,32 +17,6 @@ function mockReadline(answer: string) {
 
     return { mockQuestion, mockClose };
 }
-
-describe('getUserInput', () => {
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    it('should resolve with the user input', async () => {
-        const { mockQuestion, mockClose } = mockReadline('John Doe');
-        const query = 'Enter your name: ';
-        const result = await getUserInput(query);
-
-        expect(result).toBe('John Doe');
-        expect(mockQuestion).toHaveBeenCalledWith(query, expect.any(Function));
-        expect(mockClose).toHaveBeenCalled();
-    });
-
-    it('should handle empty string input', async () => {
-        const { mockQuestion, mockClose } = mockReadline('');
-        const query = 'Enter input: ';
-        const result = await getUserInput(query);
-
-        expect(result).toBe('');
-        expect(mockQuestion).toHaveBeenCalledWith(query, expect.any(Function));
-        expect(mockClose).toHaveBeenCalled();
-    });
-});
 
 describe('getInteger', () => {
     let consoleLogSpy: jest.SpyInstance;
@@ -84,4 +57,42 @@ describe('getInteger', () => {
         await getInteger(prompt);
         expect(mockQuestion).toHaveBeenCalledWith(prompt, expect.any(Function));
     });
+    
 });
+
+describe('promptYesNo', () => {
+    let consoleLogSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {}); // Mock console.log
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+  
+    it('should resolve with "yes" when the user enters "yes"', async () => {
+        mockReadline('yes');
+        const result = await promptYesNo('Do you agree?');
+        expect(result).toBe('yes');
+    });
+
+    it('should resolve with "n" when the user enters "n"', async () => {
+        mockReadline('n');
+        const result = await promptYesNo('Confirm?');
+        expect(result).toBe('n');
+    });
+  
+    it('should handle uppercase input and resolve with lowercase', async () => {
+        mockReadline('YES');
+        const result = await promptYesNo('Ready');
+        expect(result).toBe('yes');
+    });
+  
+    it('should handle leading/trailing whitespace and resolve with trimmed lowercase', async () => {
+        mockReadline('  Yes  ');
+        const result = await promptYesNo('Start');
+        expect(result).toBe('yes');
+    });
+  
+  });
