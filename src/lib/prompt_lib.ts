@@ -1,4 +1,4 @@
-import {formPrompt} from "../utils/string_utils";
+import {formPrompt, formPromptWithDefault } from "../utils/string_utils";
 import { getUserInput } from "../utils/user_input_utils";
 
 function errorPromise(): Promise<string> {
@@ -7,15 +7,18 @@ function errorPromise(): Promise<string> {
     });
 }
 
-export async function getInteger(userPrompt? :string): Promise<number> {
+export async function getInteger(userPrompt? :string, defaultVal?: number): Promise<number> {
     const intPattern: RegExp = /^[0-9]+$/i;
-    var promptText = formPrompt(userPrompt);
+    var promptText = formPromptWithDefault(userPrompt, defaultVal);
     var myVal: number = null;
     var notDone = true;
     while(notDone) {
         let myInteger: number = null;
         const intval = await getUserInput(promptText);
-        if (intPattern.test(intval)) {
+        if (intval == "" && defaultVal) {
+            notDone = false;
+            myVal = defaultVal;
+        } else if (intPattern.test(intval)) {
             notDone = false;
             myVal = parseInt(intval);
         } else {
