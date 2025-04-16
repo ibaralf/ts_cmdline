@@ -1,4 +1,5 @@
-import {formPrompt, formPromptWithDefault } from "../utils/string_utils";
+import { decodeAbiParameters } from "viem";
+import {formPrompt, formPromptWithDefault, formYesNoPrompt, formBooleanPrompt } from "../utils/string_utils";
 import { getUserInput } from "../utils/user_input_utils";
 
 function errorPromise(): Promise<string> {
@@ -31,8 +32,8 @@ export async function getInteger(userPrompt? :string, defaultVal?: number): Prom
     });
 }
 
-export async function promptYesNo(userPrompt? :string): Promise<string> {
-    let promptText = formPrompt(userPrompt) + "(Y/N)? "
+export async function promptYesNo(userPrompt? :string, defaultVal?: string): Promise<string> {
+    let promptText = formYesNoPrompt(userPrompt, defaultVal)
     var myVal: string = null;
     var notDone = true;
     while(notDone) {
@@ -40,11 +41,44 @@ export async function promptYesNo(userPrompt? :string): Promise<string> {
         let myString: string = null;
         const strVal = await getUserInput(promptText);
         myString = strVal.trim().toLowerCase();
+        if (myString == "" && defaultVal) {
+            myString = defaultVal;
+        }
         if (ynArray.includes(myString)) {
             notDone = false;
             myVal = myString;
         } else {
             console.log('ERROR: Please enter Yes or No only.')
+        }
+    }
+
+    return new Promise((resolve) => {
+        resolve(myVal)
+    });
+}
+
+export async function promptBool(userPrompt?: string, defaultVal?: boolean): Promise<boolean> {
+    let promptText = formBooleanPrompt(userPrompt, defaultVal)
+    var myVal: boolean = false;
+    var notDone = true;
+    while(notDone) {
+        const trueArray: string[] = ["yes", "y", "true", "t"];
+        const falseArray: string[] = ["no", "n", "false", "f"];
+        let myString: string = null;
+        const strVal = await getUserInput(promptText);
+        myString = strVal.trim().toLowerCase();
+        if (myString == "" && defaultVal) {
+            console.log("SHOULD BE FAULT");
+            notDone = false;
+            myVal = defaultVal;
+        } else if (trueArray.includes(myString)) {
+            notDone = false;
+            myVal = true;
+        } else if (falseArray.includes(myString)) {
+            notDone = false;
+            myVal = false;
+        } else {
+            console.log('ERROR: Please enter True or False only.')
         }
     }
 
